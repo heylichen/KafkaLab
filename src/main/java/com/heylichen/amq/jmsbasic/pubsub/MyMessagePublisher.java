@@ -1,0 +1,72 @@
+package com.heylichen.amq.jmsbasic.pubsub;
+
+import javax.jms.Connection;
+import javax.jms.DeliveryMode;
+import javax.jms.MessageProducer;
+import javax.jms.Session;
+import javax.jms.TextMessage;
+import javax.jms.Topic;
+
+import org.apache.activemq.ActiveMQConnectionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Created by lichen2 on 2016/6/1.
+ */
+public class MyMessagePublisher implements Runnable {
+
+  private static final Logger logger = LoggerFactory.getLogger(MyMessagePublisher.class);
+
+  public void run() {
+    Connection connection = null;
+    Session session = null;
+    MessageProducer producer = null;
+    try {
+      // Create a ConnectionFactory
+      ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");
+
+      // Create a Connection
+      connection = connectionFactory.createConnection();
+      connection.start();
+
+      // Create a Session
+      session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+
+      // Create the destination (Topic or Queue)
+      Topic destination = session.createTopic("TEST.FOO.TOPIC");
+
+      // Create a MessageProducer from the Session to the Topic or Queue
+      producer = session.createProducer(destination);
+      producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+
+      // Create a messages
+      String text = "Hello world! From  " + Thread.currentThread().getName();
+      TextMessage message = session.createTextMessage(text);
+
+      // Tell the producer to send the message
+      logger.info("Sent message: " + message.hashCode() + " : " + Thread.currentThread().getName());
+      producer.send(message);
+    } catch (Exception e) {
+      System.out.println("Caught: " + e);
+      e.printStackTrace();
+    } finally {
+      // Clean up
+      try {
+        if (producer != null) {
+          producer.close();
+        }
+        if (session != null) {
+          session.close();
+        }
+        if (connection != null) {
+          connection.close();
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+  }
+
+
+}
