@@ -1,19 +1,18 @@
-package com.heylichen.amq.jmsbasic.pubsub;
+package com.heylichen.amq.jms.basic.p2p;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.jms.*;
 
-import static com.heylichen.amq.jmsbasic.pubsub.MyMessagePublisher.TOPIC;
-
 /**
  * Created by lichen2 on 2016/6/1.
  */
-public class MySyncMessageSubscriber implements Runnable {
-
-  private static final Logger logger = LoggerFactory.getLogger(MySyncMessageSubscriber.class);
+public class TransientAsyncMessageConsumer implements MessageListener, Runnable {
+  private long ttl = 1000;
+  private static final Logger logger = LoggerFactory.getLogger(TransientAsyncMessageConsumer.class);
 
   public void run() {
     Connection connection = null;
@@ -31,13 +30,13 @@ public class MySyncMessageSubscriber implements Runnable {
       session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
       // Create the destination (Topic or Queue)
-      Topic destination = session.createTopic(TOPIC);
+      Destination destination = session.createQueue(MyMessageProducer.QUEUE);
 
       consumer = session.createConsumer(destination);
-      TextMessage message = (TextMessage) consumer.receive(1000);
+      consumer.setMessageListener(this);
 
-      // Tell the producer to send the message
-      logger.info("received message:" + message.getText());
+      //keep connection for a while, enough to let this get msg
+      Thread.sleep(ttl);
     } catch (Exception e) {
       System.out.println("Caught: " + e);
       e.printStackTrace();
@@ -57,5 +56,24 @@ public class MySyncMessageSubscriber implements Runnable {
         e.printStackTrace();
       }
     }
+  }
+
+  @Override
+  public void onMessage(Message message) {
+    try {
+      if (message instanceof TextMessage) {
+        TextMessage tm = (TextMessage) message;
+        logger.info("got:{}", tm.getText());
+      } else {
+        logger.info("got:{}", JSON.toJSONString(message));
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+  }
+
+  public void setTtl(long ttl) {
+    this.ttl = ttl;
   }
 }

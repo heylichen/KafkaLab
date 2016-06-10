@@ -1,9 +1,9 @@
-package com.heylichen.amq.jmsbasic;
+package com.heylichen.amq.jms.basic;
 
-import com.heylichen.amq.jmsbasic.p2p.MyMessageProducer;
-import com.heylichen.amq.jmsbasic.p2p.MySyncMessageConsumer;
-import com.heylichen.amq.jmsbasic.p2p.TransientAsyncMessageConsumer;
-import com.heylichen.amq.jmsbasic.p2p.durable.PeriodMessageProducer;
+import com.heylichen.amq.jms.basic.p2p.MySyncMessageConsumer;
+import com.heylichen.amq.jms.basic.p2p.MyMessageProducer;
+import com.heylichen.amq.jms.basic.p2p.TransientAsyncMessageConsumer;
+import com.heylichen.amq.jms.basic.p2p.durable.PeriodMessageProducer;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

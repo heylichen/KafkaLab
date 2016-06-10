@@ -1,4 +1,4 @@
-package com.heylichen.amq.jmsbasic.pubsub;
+package com.heylichen.amq.jms.basic.pubsub;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.slf4j.Logger;

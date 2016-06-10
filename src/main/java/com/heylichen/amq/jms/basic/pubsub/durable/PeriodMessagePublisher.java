@@ -1,25 +1,22 @@
-package com.heylichen.amq.jmsbasic.pubsub;
+package com.heylichen.amq.jms.basic.pubsub.durable;
 
-import com.alibaba.fastjson.JSON;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.jms.*;
 
-import static com.heylichen.amq.jmsbasic.pubsub.MyMessagePublisher.TOPIC;
-
 /**
  * Created by lichen2 on 2016/6/1.
  */
-public class MyAsyncMessageSubscriber implements MessageListener, Runnable {
-
-  private static final Logger logger = LoggerFactory.getLogger(MyAsyncMessageSubscriber.class);
+public class PeriodMessagePublisher implements Runnable {
+  public static final String TOPIC = "QUICKSTART.TOPIC";
+  private static final Logger logger = LoggerFactory.getLogger(PeriodMessagePublisher.class);
 
   public void run() {
     Connection connection = null;
     Session session = null;
-    MessageConsumer consumer = null;
+    MessageProducer producer = null;
     try {
       // Create a ConnectionFactory
       ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");
@@ -32,21 +29,31 @@ public class MyAsyncMessageSubscriber implements MessageListener, Runnable {
       session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
       // Create the destination (Topic or Queue)
-      Destination destination = session.createTopic(TOPIC);
+      Topic destination = session.createTopic(TOPIC);
 
-      consumer = session.createConsumer(destination);
-      consumer.setMessageListener(this);
+      // Create a MessageProducer from the Session to the Topic or Queue
+      producer = session.createProducer(destination);
+      producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
 
-      //keep connection for a while, enough to let this get msg
-      Thread.sleep(1000);
+      // Create a messages
+
+
+      // Tell the producer to send the message
+      for(int i=0; i<10; i++){
+        String text = "msg:"+i+"from  " + Thread.currentThread().getName();
+        TextMessage message = session.createTextMessage(text);
+        producer.send(message);
+        Thread.sleep(1000);
+      }
+
     } catch (Exception e) {
       System.out.println("Caught: " + e);
       e.printStackTrace();
     } finally {
+      // Clean up
       try {
-        // Clean up
-        if (consumer != null) {
-          consumer.close();
+        if (producer != null) {
+          producer.close();
         }
         if (session != null) {
           session.close();
@@ -57,22 +64,8 @@ public class MyAsyncMessageSubscriber implements MessageListener, Runnable {
       } catch (Exception e) {
         e.printStackTrace();
       }
-
     }
   }
 
-  @Override
-  public void onMessage(Message message) {
-    try {
-      if (message instanceof TextMessage) {
-        TextMessage tm = (TextMessage) message;
-        logger.info("got:{}", tm.getText());
-      } else {
-        logger.info("got:{}", JSON.toJSONString(message));
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
 
-  }
 }

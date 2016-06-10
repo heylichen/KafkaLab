@@ -1,4 +1,4 @@
-package com.heylichen.amq.jmsbasic.p2p;
+package com.heylichen.amq.jms.basic.p2p;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.slf4j.Logger;
@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.jms.*;
 
-import static com.heylichen.amq.jmsbasic.p2p.MyMessageProducer.QUEUE;
+import static com.heylichen.amq.jms.basic.p2p.MyMessageProducer.QUEUE;
 
 /**
  * Created by lichen2 on 2016/6/1.

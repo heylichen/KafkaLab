@@ -1,4 +1,4 @@
-package com.heylichen.amq.jmsbasic.pubsub.durable;
+package com.heylichen.amq.jms.basic.pubsub.durable;
 
 import com.alibaba.fastjson.JSON;
 import org.apache.activemq.ActiveMQConnectionFactory;
@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.jms.*;
 
-import static com.heylichen.amq.jmsbasic.pubsub.MyMessagePublisher.TOPIC;
+import static com.heylichen.amq.jms.basic.pubsub.MyMessagePublisher.TOPIC;
 
 /**
  * Created by lichen2 on 2016/6/1.

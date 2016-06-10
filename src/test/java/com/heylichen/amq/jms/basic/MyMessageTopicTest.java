@@ -1,8 +1,10 @@
-package com.heylichen.amq.jmsbasic;
+package com.heylichen.amq.jms.basic;
 
-import com.heylichen.amq.jmsbasic.pubsub.*;
-import com.heylichen.amq.jmsbasic.pubsub.durable.PeriodMessagePublisher;
-import com.heylichen.amq.jmsbasic.pubsub.durable.DurableAsyncMessageSubscriber;
+import com.heylichen.amq.jms.basic.pubsub.MyAsyncMessageSubscriber;
+import com.heylichen.amq.jms.basic.pubsub.durable.DurableAsyncMessageSubscriber;
+import com.heylichen.amq.jms.basic.pubsub.durable.PeriodMessagePublisher;
+import com.heylichen.amq.jms.basic.pubsub.MyMessagePublisher;
+import com.heylichen.amq.jms.basic.pubsub.MySyncMessageSubscriber;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

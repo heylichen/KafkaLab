@@ -1,4 +1,4 @@
-package com.heylichen.amq.jmsbasic.pubsub.durable;
+package com.heylichen.amq.jms.basic.p2p.durable;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.slf4j.Logger;
@@ -9,9 +9,11 @@ import javax.jms.*;
 /**
  * Created by lichen2 on 2016/6/1.
  */
-public class PeriodMessagePublisher implements Runnable {
-  public static final String TOPIC = "QUICKSTART.TOPIC";
-  private static final Logger logger = LoggerFactory.getLogger(PeriodMessagePublisher.class);
+public class PeriodMessageProducer implements Runnable {
+  public static final String QUEUE = "QUICKSTART.QUEUE";
+  private static final Logger logger = LoggerFactory.getLogger(PeriodMessageProducer.class);
+  private long msgTtl = 0;// message time to live, in ms
+
 
   public void run() {
     Connection connection = null;
@@ -29,29 +31,26 @@ public class PeriodMessagePublisher implements Runnable {
       session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
       // Create the destination (Topic or Queue)
-      Topic destination = session.createTopic(TOPIC);
+      Destination destination = session.createQueue(QUEUE);
 
       // Create a MessageProducer from the Session to the Topic or Queue
       producer = session.createProducer(destination);
+      producer.setTimeToLive(msgTtl);
       producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
 
-      // Create a messages
-
-
       // Tell the producer to send the message
-      for(int i=0; i<10; i++){
-        String text = "msg:"+i+"from  " + Thread.currentThread().getName();
+      for (int i = 0; i < 10; i++) {
+        String text = "msg:" + i + "from  " + Thread.currentThread().getName();
         TextMessage message = session.createTextMessage(text);
         producer.send(message);
         Thread.sleep(1000);
       }
-
     } catch (Exception e) {
       System.out.println("Caught: " + e);
       e.printStackTrace();
     } finally {
-      // Clean up
       try {
+        // Clean up
         if (producer != null) {
           producer.close();
         }
@@ -67,5 +66,11 @@ public class PeriodMessagePublisher implements Runnable {
     }
   }
 
+  public long getMsgTtl() {
+    return msgTtl;
+  }
 
+  public void setMsgTtl(long msgTtl) {
+    this.msgTtl = msgTtl;
+  }
 }
