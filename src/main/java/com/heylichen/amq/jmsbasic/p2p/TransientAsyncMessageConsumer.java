@@ -1,24 +1,20 @@
 package com.heylichen.amq.jmsbasic.p2p;
 
-import javax.jms.Connection;
-import javax.jms.Destination;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageListener;
-import javax.jms.Session;
-import javax.jms.TextMessage;
-
 import com.alibaba.fastjson.JSON;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.jms.*;
+
+import static com.heylichen.amq.jmsbasic.p2p.MyMessageProducer.QUEUE;
+
 /**
  * Created by lichen2 on 2016/6/1.
  */
-public class MyAsyncMessageConsumer implements MessageListener, Runnable {
-
-  private static final Logger logger = LoggerFactory.getLogger(MyAsyncMessageConsumer.class);
+public class TransientAsyncMessageConsumer implements MessageListener, Runnable {
+  private long ttl = 1000;
+  private static final Logger logger = LoggerFactory.getLogger(TransientAsyncMessageConsumer.class);
 
   public void run() {
     Connection connection = null;
@@ -36,13 +32,13 @@ public class MyAsyncMessageConsumer implements MessageListener, Runnable {
       session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
       // Create the destination (Topic or Queue)
-      Destination destination = session.createQueue("TEST.FOO");
+      Destination destination = session.createQueue(QUEUE);
 
       consumer = session.createConsumer(destination);
       consumer.setMessageListener(this);
 
       //keep connection for a while, enough to let this get msg
-      Thread.sleep(1000);
+      Thread.sleep(ttl);
     } catch (Exception e) {
       System.out.println("Caught: " + e);
       e.printStackTrace();
@@ -77,5 +73,9 @@ public class MyAsyncMessageConsumer implements MessageListener, Runnable {
       e.printStackTrace();
     }
 
+  }
+
+  public void setTtl(long ttl) {
+    this.ttl = ttl;
   }
 }

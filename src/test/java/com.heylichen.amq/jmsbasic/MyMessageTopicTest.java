@@ -1,14 +1,14 @@
 package com.heylichen.amq.jmsbasic;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import com.heylichen.amq.jmsbasic.pubsub.MyAsyncMessageSubscriber;
-import com.heylichen.amq.jmsbasic.pubsub.MyMessagePublisher;
-import com.heylichen.amq.jmsbasic.pubsub.MySyncMessageSubscriber;
+import com.heylichen.amq.jmsbasic.pubsub.*;
+import com.heylichen.amq.jmsbasic.pubsub.durable.PeriodMessagePublisher;
+import com.heylichen.amq.jmsbasic.pubsub.durable.DurableAsyncMessageSubscriber;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by lichen2 on 2016/6/1.
@@ -42,4 +42,20 @@ public class MyMessageTopicTest {
     Thread.sleep(3000);
   }
 
+
+  @Test
+  public void durableTest() throws Exception {
+    boolean durable =false;
+    PeriodMessagePublisher p = new PeriodMessagePublisher();
+    DurableAsyncMessageSubscriber subscriber = new DurableAsyncMessageSubscriber(durable);
+
+    exec.submit(subscriber);
+    exec.submit(p);
+    Thread.sleep(9000);
+
+    subscriber = new DurableAsyncMessageSubscriber(durable);
+    exec.submit(subscriber);
+
+    Thread.sleep(3000);
+  }
 }

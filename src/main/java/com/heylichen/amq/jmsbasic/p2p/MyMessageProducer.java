@@ -1,21 +1,16 @@
 package com.heylichen.amq.jmsbasic.p2p;
 
-import javax.jms.Connection;
-import javax.jms.DeliveryMode;
-import javax.jms.Destination;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
-import javax.jms.TextMessage;
-
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.jms.*;
 
 /**
  * Created by lichen2 on 2016/6/1.
  */
 public class MyMessageProducer implements Runnable {
-
+  public static final String QUEUE = "QUICKSTART.QUEUE";
   private static final Logger logger = LoggerFactory.getLogger(MyMessageProducer.class);
 
   public void run() {
@@ -34,7 +29,7 @@ public class MyMessageProducer implements Runnable {
       session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
       // Create the destination (Topic or Queue)
-      Destination destination = session.createQueue("TEST.FOO");
+      Destination destination = session.createQueue(QUEUE);
 
       // Create a MessageProducer from the Session to the Topic or Queue
       producer = session.createProducer(destination);

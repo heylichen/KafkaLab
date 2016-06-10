@@ -1,4 +1,4 @@
-package com.heylichen.amq.jmsbasic.pubsub;
+package com.heylichen.amq.jmsbasic.pubsub.durable;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.slf4j.Logger;
@@ -9,9 +9,9 @@ import javax.jms.*;
 /**
  * Created by lichen2 on 2016/6/1.
  */
-public class MyMessagePublisher implements Runnable {
+public class PeriodMessagePublisher implements Runnable {
   public static final String TOPIC = "QUICKSTART.TOPIC";
-  private static final Logger logger = LoggerFactory.getLogger(MyMessagePublisher.class);
+  private static final Logger logger = LoggerFactory.getLogger(PeriodMessagePublisher.class);
 
   public void run() {
     Connection connection = null;
@@ -36,12 +36,16 @@ public class MyMessagePublisher implements Runnable {
       producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
 
       // Create a messages
-      String text = "Hello world! From  " + Thread.currentThread().getName();
-      TextMessage message = session.createTextMessage(text);
+
 
       // Tell the producer to send the message
-      logger.info("Sent message: " + message.hashCode() + " : " + Thread.currentThread().getName());
-      producer.send(message);
+      for(int i=0; i<10; i++){
+        String text = "msg:"+i+"from  " + Thread.currentThread().getName();
+        TextMessage message = session.createTextMessage(text);
+        producer.send(message);
+        Thread.sleep(1000);
+      }
+
     } catch (Exception e) {
       System.out.println("Caught: " + e);
       e.printStackTrace();

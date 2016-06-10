@@ -1,14 +1,12 @@
 package com.heylichen.amq.jmsbasic.pubsub;
 
-import javax.jms.Connection;
-import javax.jms.MessageConsumer;
-import javax.jms.Session;
-import javax.jms.TextMessage;
-import javax.jms.Topic;
-
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.jms.*;
+
+import static com.heylichen.amq.jmsbasic.pubsub.MyMessagePublisher.TOPIC;
 
 /**
  * Created by lichen2 on 2016/6/1.
@@ -33,7 +31,7 @@ public class MySyncMessageSubscriber implements Runnable {
       session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
       // Create the destination (Topic or Queue)
-      Topic destination = session.createTopic("TEST.FOO.TOPIC");
+      Topic destination = session.createTopic(TOPIC);
 
       consumer = session.createConsumer(destination);
       TextMessage message = (TextMessage) consumer.receive(1000);

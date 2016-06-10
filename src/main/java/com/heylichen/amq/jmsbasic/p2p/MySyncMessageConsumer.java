@@ -1,20 +1,17 @@
 package com.heylichen.amq.jmsbasic.p2p;
 
-import javax.jms.Connection;
-import javax.jms.Destination;
-import javax.jms.MessageConsumer;
-import javax.jms.Session;
-import javax.jms.TextMessage;
-
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.jms.*;
+
+import static com.heylichen.amq.jmsbasic.p2p.MyMessageProducer.QUEUE;
 
 /**
  * Created by lichen2 on 2016/6/1.
  */
 public class MySyncMessageConsumer implements Runnable {
-
   private static final Logger logger = LoggerFactory.getLogger(MySyncMessageConsumer.class);
 
   public void run() {
@@ -33,7 +30,7 @@ public class MySyncMessageConsumer implements Runnable {
       session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
       // Create the destination (Topic or Queue)
-      Destination destination = session.createQueue("TEST.FOO");
+      Destination destination = session.createQueue(QUEUE);
       consumer = session.createConsumer(destination);
       TextMessage message = (TextMessage) consumer.receive(1000);
 

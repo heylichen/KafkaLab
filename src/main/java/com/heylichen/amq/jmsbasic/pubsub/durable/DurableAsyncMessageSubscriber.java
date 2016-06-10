@@ -1,4 +1,4 @@
-package com.heylichen.amq.jmsbasic.pubsub;
+package com.heylichen.amq.jmsbasic.pubsub.durable;
 
 import com.alibaba.fastjson.JSON;
 import org.apache.activemq.ActiveMQConnectionFactory;
@@ -12,33 +12,44 @@ import static com.heylichen.amq.jmsbasic.pubsub.MyMessagePublisher.TOPIC;
 /**
  * Created by lichen2 on 2016/6/1.
  */
-public class MyAsyncMessageSubscriber implements MessageListener, Runnable {
+public class DurableAsyncMessageSubscriber implements MessageListener, Runnable {
+  private boolean durable = false;
+  private static final Logger logger = LoggerFactory.getLogger(DurableAsyncMessageSubscriber.class);
+  Connection connection = null;
+  Session session = null;
+  MessageConsumer consumer = null;
 
-  private static final Logger logger = LoggerFactory.getLogger(MyAsyncMessageSubscriber.class);
+  public DurableAsyncMessageSubscriber(boolean durable) {
+    this.durable = durable;
+  }
 
   public void run() {
-    Connection connection = null;
-    Session session = null;
-    MessageConsumer consumer = null;
     try {
       // Create a ConnectionFactory
       ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");
 
       // Create a Connection
       connection = connectionFactory.createConnection();
+      connection.setClientID("testClient");
       connection.start();
 
       // Create a Session
+
+
       session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-
       // Create the destination (Topic or Queue)
-      Destination destination = session.createTopic(TOPIC);
+      Topic topic = session.createTopic(TOPIC);
 
-      consumer = session.createConsumer(destination);
+      if (durable) {
+        consumer = session.createDurableSubscriber(topic, TOPIC + ".Durable.Consumer");
+      } else {
+        consumer = session.createConsumer(topic);
+      }
+
       consumer.setMessageListener(this);
 
       //keep connection for a while, enough to let this get msg
-      Thread.sleep(1000);
+      Thread.sleep(3000);
     } catch (Exception e) {
       System.out.println("Caught: " + e);
       e.printStackTrace();
