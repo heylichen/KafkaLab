@@ -13,6 +13,7 @@ public class ConnectorPublisher implements Runnable {
   public static final String TOPIC = "Connector.Topic";
 
   public ConnectorPublisher(String url) {
+    logger.info("using url {}", url);
     this.url = url;
   }
 
